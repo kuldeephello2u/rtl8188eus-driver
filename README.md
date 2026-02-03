@@ -1,85 +1,36 @@
-## rtl8188eus v5.3.9
+# RTL8188EUS Driver for Linux Kernel 6.14
 
+This is a patched version of the `aircrack-ng/rtl8188eus` driver, specifically updated to support Linux Kernel **6.14.0-37-generic**.
 
-# THESE DRIVERS IS DEPRECATED.
-# Use the mac80211 drivers over at [https://github.com/lwfinger/rtw88](https://github.com/lwfinger/rtw88)
+## Patches Applied
 
+1.  **Preprocessor Balancing**: Fixed a missing `#endif` in `os_dep/linux/ioctl_cfg80211.c` that caused structural corruption in the code on modern kernels.
+2.  **API Compatibility**: Fixed several syntax typos (e.g., `chandef` -> `chdef`) and removed redundant registrations that caused "duplicate member" errors in `rtw_cfg80211_ops`.
+3.  **Variable Shadowing**: Cleaned up uninitialized and undeclared variable usage in `ioctl_cfg80211.c`.
 
+## Installation
 
-# Realtek rtl8188eus &amp; rtl8188eu &amp; rtl8188etv WiFi drivers
-
-[![Monitor mode](https://img.shields.io/badge/monitor%20mode-supported-brightgreen.svg)](#)
-[![Frame Injection](https://img.shields.io/badge/frame%20injection-supported-brightgreen.svg)](#)
-[![MESH Mode](https://img.shields.io/badge/mesh%20mode-supported-brightgreen.svg)](#)
-[![GitHub issues](https://img.shields.io/github/issues/aircrack-ng/rtl8188eus.svg)](https://github.com/aircrack-ng/rtl8188eus/issues)
-[![GitHub forks](https://img.shields.io/github/forks/aircrack-ng/rtl8188eus.svg)](https://github.com/aircrack-ng/rtl8188eus/network)
-[![GitHub stars](https://img.shields.io/github/stars/aircrack-ng/rtl8188eus.svg)](https://github.com/aircrack-ng/rtl8188eus/stargazers)
-[![GitHub license](https://img.shields.io/github/license/aircrack-ng/rtl8812au.svg)](https://github.com/aircrack-ng/rtl8188eus/blob/master/LICENSE)<br>
-[![Android](https://img.shields.io/badge/android%20(8)-supported-brightgreen.svg)](#)
-[![aircrack-ng](https://img.shields.io/badge/aircrack--ng-supported-blue.svg)](#)
-
-
-# Supports
-* Android 12/13
-* MESH Support
-* Monitor mode
-* Frame injection
-* Up to kernel v6.5+
-... And a bunch of various wifi chipsets
-
-# Howto build/install
-1. Compile and install the driver:
-```
-cd rtl8188eus
-make && sudo make install
-```
-2. Blacklist another drivers in order to use this one:
-```
-echo 'blacklist r8188eu' | sudo tee -a '/etc/modprobe.d/realtek.conf'
-echo 'blacklist rtl8xxxu' | sudo tee -a '/etc/modprobe.d/realtek.conf'
-```
-3. `reboot` or remove all drivers related to RTL8188 and reload this one:
-```
-rmmod r8188eu rtl8xxxu 8188eu
-modprobe 8188eu
+### Prerequisites
+You need the kernel headers and build tools installed:
+```bash
+sudo apt update
+sudo apt install linux-headers-$(uname -r) build-essential dkms git
 ```
 
-# MONITOR MODE howto
-Use these steps to enter monitor mode.
-```
-sudo airmon-ng check kill
-sudo ip link set <interface> down
-sudo iw dev <interface> set type monitor
-```
-Frame injection test may be performed with
-(after kernel v5.2 scanning is slow, run a scan or simply an airodump-ng first!)
-```
-sudo aireplay-ng -9 <interface>
+### via DKMS (Recommended)
+```bash
+sudo dkms add -m 8188eu -v 5.3.9
+sudo dkms build -m 8188eu -v 5.3.9
+sudo dkms install -m 8188eu -v 5.3.9
+sudo modprobe 8188eu
 ```
 
-# NetworkManager configuration
-Add these lines below to "NetworkManager.conf" and ADD YOUR ADAPTER MAC below [keyfile]
-This will make the Network-Manager ignore the device, and therefore don't cause problems.
-```
-[device]
-wifi.scan-rand-mac-address=no
-
-[ifupdown]
-managed=false
-
-[connection]
-wifi.powersave=0
-
-[main]
-plugins=keyfile
-
-[keyfile]
-unmanaged-devices=mac:A7:A7:A7:A7:A7
+### Manual Build
+```bash
+make
+sudo make install
+sudo modprobe 8188eu
 ```
 
-# Credits
-Realtek       - https://www.realtek.com<br>
-Alfa Networks - https://www.alfa.com.tw<br>
-aircrack-ng.  - https://www.aircrack-ng.org<br>
-<br>
-And all those who may be using or contributing to it of anykind. Thanks!<br>
+## Credits
+Based on the [aircrack-ng/rtl8188eus](https://github.com/aircrack-ng/rtl8188eus) repository.
