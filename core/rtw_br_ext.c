@@ -15,10 +15,10 @@
 #define _RTW_BR_EXT_C_
 
 #ifdef __KERNEL__
-    #include <linux/version.h>
 	#include <linux/if_arp.h>
 	#include <net/ip.h>
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
+	#include <linux/version.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0))
 	#include <net/ipx.h>
 #endif
 	#include <linux/atalk.h>
@@ -117,13 +117,7 @@ static __inline__ int __nat25_add_pppoe_tag(struct sk_buff *skb, struct pppoe_ta
 	/* have a room for new tag */
 	memmove(((unsigned char *)ph->tag + data_len), (unsigned char *)ph->tag, ntohs(ph->length));
 	ph->length = htons(ntohs(ph->length) + data_len);
-#if (defined __GNUC__) && (__GNUC__ > 10)
-    #pragma GCC diagnostic ignored "-Wstringop-overread"
-#endif
 	memcpy((unsigned char *)ph->tag, tag, data_len);
-#if (defined __GNUC__) && (__GNUC__ > 10)
-    #pragma GCC diagnostic pop
-#endif
 	return data_len;
 }
 
@@ -178,6 +172,7 @@ static __inline__ void __nat25_generate_ipv4_network_addr(unsigned char *network
 }
 
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0))
 static __inline__ void __nat25_generate_ipx_network_addr_with_node(unsigned char *networkAddr,
 		unsigned int *ipxNetAddr, unsigned char *ipxNodeAddr)
 {
@@ -209,6 +204,7 @@ static __inline__ void __nat25_generate_apple_network_addr(unsigned char *networ
 	memcpy(networkAddr + 1, (unsigned char *)network, 2);
 	networkAddr[3] = *node;
 }
+#endif
 
 
 static __inline__ void __nat25_generate_pppoe_network_addr(unsigned char *networkAddr,
@@ -310,7 +306,7 @@ static int update_nd_link_layer_addr(unsigned char *data, int len, unsigned char
 	return 0;
 }
 
-
+#ifdef SUPPORT_RX_UNI2MCAST
 static void convert_ipv6_mac_to_mc(struct sk_buff *skb)
 {
 	struct ipv6hdr *iph = (struct ipv6hdr *)(skb->data + ETH_HLEN);
@@ -328,6 +324,7 @@ static void convert_ipv6_mac_to_mc(struct sk_buff *skb)
 #endif
 }
 #endif /* CL_IPV6_PASS */
+#endif /* SUPPORT_RX_UNI2MCAST */
 
 
 static __inline__ int __nat25_network_hash(unsigned char *networkAddr)
@@ -338,6 +335,7 @@ static __inline__ int __nat25_network_hash(unsigned char *networkAddr)
 		x = networkAddr[7] ^ networkAddr[8] ^ networkAddr[9] ^ networkAddr[10];
 
 		return x & (NAT25_HASH_SIZE - 1);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0))
 	} else if (networkAddr[0] == NAT25_IPX) {
 		unsigned long x;
 
@@ -351,6 +349,7 @@ static __inline__ int __nat25_network_hash(unsigned char *networkAddr)
 		x = networkAddr[1] ^ networkAddr[2] ^ networkAddr[3];
 
 		return x & (NAT25_HASH_SIZE - 1);
+#endif
 	} else if (networkAddr[0] == NAT25_PPPOE) {
 		unsigned long x;
 
@@ -897,6 +896,7 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 		}
 	}
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0))
 	/*---------------------------------------------------*/
 	/*         Handle IPX and Apple Talk frame          */
 	/*---------------------------------------------------*/
@@ -957,7 +957,6 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 			}
 		}
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 15, 0)
 		/*   IPX  */
 		if (ipx != NULL) {
 			switch (method) {
@@ -1026,12 +1025,8 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 			}
 		}
 
-
 		/*   AARP  */
 		else if (ea != NULL) {
-#else
-		if (ea != NULL) {
-#endif
 			/* Sanity check fields. */
 			if (ea->hw_len != ETH_ALEN || ea->pa_len != AARP_PA_ALEN) {
 				DEBUG_WARN("NAT25: Appletalk AARP Sanity check fail!\n");
@@ -1122,6 +1117,7 @@ int nat25_db_handle(_adapter *priv, struct sk_buff *skb, int method)
 
 		return -1;
 	}
+#endif
 
 	/*---------------------------------------------------*/
 	/*                Handle PPPoE frame                */

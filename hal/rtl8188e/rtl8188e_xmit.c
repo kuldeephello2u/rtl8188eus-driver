@@ -119,12 +119,12 @@ struct EMInfo {
 void
 InsertEMContent_8188E(
 	struct EMInfo *pEMInfo,
-	IN pu1Byte	VirtualAddress)
+	u8 *VirtualAddress)
 {
 
 #if RTL8188E_EARLY_MODE_PKT_NUM_10 == 1
-	u1Byte index = 0;
-	u4Byte	dwtmp = 0;
+	u8 index = 0;
+	u32	dwtmp = 0;
 #endif
 
 	_rtw_memset(VirtualAddress, 0, EARLY_MODE_INFO_SIZE);
@@ -271,7 +271,6 @@ void UpdateEarlyModeInfo8188E(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmi
 }
 #endif
 
-#if defined(CONFIG_CONCURRENT_MODE)
 void fill_txdesc_force_bmc_camid(struct pkt_attrib *pattrib, struct tx_desc *ptxdesc)
 {
 	if ((pattrib->encrypt > 0) && (!pattrib->bswenc)
@@ -281,7 +280,6 @@ void fill_txdesc_force_bmc_camid(struct pkt_attrib *pattrib, struct tx_desc *ptx
 		ptxdesc->txdw1 |= cpu_to_le32((pattrib->bmc_camid) & 0x1f);
 	}
 }
-#endif
 
 void rtl8188e_cal_txdesc_chksum(struct tx_desc *ptxdesc)
 {

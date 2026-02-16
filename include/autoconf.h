@@ -20,12 +20,15 @@
 #define RTL8188E_FPGA_TRUE_PHY_VERIFICATION 0
 
 /* ***** temporarily flag ******* */
+
+#define CONFIG_REGD_SRC_FROM_OS /* default regd source selection */
+
 /*
  * Public  General Config
  */
 #define AUTOCONF_INCLUDED
 #define RTL871X_MODULE_NAME "88EU"
-#define DRV_NAME "8188eu"
+#define DRV_NAME "rtl8188eu"
 
 #define CONFIG_USB_HCI
 
@@ -55,6 +58,7 @@
 
 #define CONFIG_EMBEDDED_FWIMG
 
+
 #ifdef CONFIG_EMBEDDED_FWIMG
 	#define	LOAD_FW_HEADER_FROM_DRIVER
 #endif
@@ -83,20 +87,23 @@
 	#define CONFIG_LPS
 	#if defined(CONFIG_LPS) && defined(CONFIG_SUPPORT_USB_INT)
 
+
 	/* #define CONFIG_LPS_LCLK */
 	#endif
 
 	#ifdef CONFIG_LPS_LCLK
-	#define CONFIG_XMIT_THREAD_MODE
+	/* #define CONFIG_XMIT_THREAD_MODE */
 	#endif
 #endif /* CONFIG_POWER_SAVING */
 
 	/*#define CONFIG_ANTENNA_DIVERSITY*/
 
-	//#define CONFIG_CONCURRENT_MODE
+
+
+	/* #define CONFIG_CONCURRENT_MODE */
 	#ifdef CONFIG_CONCURRENT_MODE
 		#define CONFIG_RUNTIME_PORT_SWITCH
-                #define CONFIG_SCAN_BACKOP
+
 		#define CONFIG_TSF_RESET_OFFLOAD			/* For 2 PORT TSF SYNC. */
 	#endif
 
@@ -105,7 +112,6 @@
 
 /* #endif */	/* #ifndef CONFIG_MP_INCLUDED */
 
-#define CONFIG_AP_MODE
 #ifdef CONFIG_AP_MODE
 
 	/* #define CONFIG_INTERRUPT_BASED_TXBCN */ /* Tx Beacon when driver BCN_OK ,BCN_ERR interrupt occurs */
@@ -124,7 +130,6 @@
 	#define CONFIG_FIND_BEST_CHANNEL
 #endif
 
-#define CONFIG_P2P
 #ifdef CONFIG_P2P
 	/* The CONFIG_WFD is for supporting the Wi-Fi display */
 	#define CONFIG_WFD
@@ -150,9 +155,10 @@
 	/* #define CONFIG_TDLS_CH_SW */	/* Enable this flag only when we confirm that TDLS CH SW is supported in FW */
 #endif
 
+
 #define CONFIG_SKB_COPY	/* for amsdu */
 
-/* #define CONFIG_RTW_LED */
+#define CONFIG_RTW_LED
 #ifdef CONFIG_RTW_LED
 	#define CONFIG_RTW_SW_LED
 	#ifdef CONFIG_RTW_SW_LED
@@ -170,10 +176,9 @@
 	/* #define CONFIG_IOL_IOREG_CFG_DBG */
 #endif
 
+
 #define CONFIG_GLOBAL_UI_PID
 
-#define CONFIG_LAYER2_ROAMING
-#define CONFIG_LAYER2_ROAMING_RESUME
 /* #define CONFIG_ADAPTOR_INFO_CACHING_FILE */ /* now just applied on 8192cu only, should make it general... */
 /* #define CONFIG_RESUME_IN_WORKQUEUE */
 /* #define CONFIG_SET_SCAN_DENY_TIMER */
@@ -184,9 +189,6 @@
 /* #define CONFIG_BACKGROUND_NOISE_MONITOR */
 #endif
 #define RTW_NOTCH_FILTER 0 /* 0:Disable, 1:Enable, */
-
-#define CONFIG_TX_MCAST2UNI		/* Support IP multicast->unicast */
-/* #define CONFIG_CHECK_AC_LIFETIME */	/* Check packet lifetime of 4 ACs. */
 
 /*
  * Interface  Related Config
@@ -226,19 +228,23 @@
 
 /* #define CONFIG_USB_SUPPORT_ASYNC_VDN_REQ */
 
+
 /*
  * HAL  Related Config
  */
 
 #define RTL8188E_RX_PACKET_INCLUDE_CRC	0
+#define CONFIG_RX_PACKET_APPEND_FCS
 
 #define SUPPORTED_BLOCK_IO
+
 
 /* #define CONFIG_ONLY_ONE_OUT_EP_TO_LOW	0 */
 
 #define CONFIG_OUT_EP_WIFI_MODE	0
 
 #define ENABLE_USB_DROP_INCORRECT_OUT
+
 
 #define DISABLE_BB_RF	0
 
@@ -252,6 +258,7 @@
 #else
 	#define MP_DRIVER 0
 #endif
+
 
 /*
  * Platform  Related Config
@@ -267,6 +274,7 @@
 		#define CONFIG_USE_USB_BUFFER_ALLOC_RX
 	#endif
 #endif
+
 
 #ifdef CONFIG_USB_TX_AGGREGATION
 /* #define	CONFIG_TX_EARLY_MODE */
@@ -284,14 +292,10 @@
 	#endif
 #endif
 
-#define CONFIG_ATTEMPT_TO_FIX_AP_BEACON_ERROR
-
 /*
  * Debug Related Config
  */
 #define DBG	1
-
-#define CONFIG_PROC_DEBUG
 
 #define DBG_CONFIG_ERROR_DETECT
 /* #define DBG_CONFIG_ERROR_DETECT_INT */
@@ -311,6 +315,8 @@
 /* #define DBG_RX_SEQ */
 /* #define DBG_RX_SIGNAL_DISPLAY_PROCESSING */
 /* #define DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED "jeff-ap" */
+
+
 
 /* #define DBG_SHOW_MCUFWDL_BEFORE_51_ENABLE */
 /* #define DBG_ROAMING_TEST */

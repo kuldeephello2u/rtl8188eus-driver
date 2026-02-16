@@ -184,13 +184,15 @@
 #define SET_TX_DESC_ANTSEL_D_8188F(__pTxDesc, __Value) SET_BITS_TO_LE_4BYTE(__pTxDesc+24, 25, 3, __Value)
 
 /* Dword 7 */
-#if (DEV_BUS_TYPE == RT_PCI_INTERFACE)
+#ifdef CONFIG_PCI_HCI
 #define SET_TX_DESC_TX_BUFFER_SIZE_8188F(__pTxDesc, __Value)		SET_BITS_TO_LE_4BYTE(__pTxDesc+28, 0, 16, __Value)
-#else
+#endif
+
+#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_USB_HCI)
 #define SET_TX_DESC_TX_DESC_CHECKSUM_8188F(__pTxDesc, __Value) SET_BITS_TO_LE_4BYTE(__pTxDesc+28, 0, 16, __Value)
 #endif
 #define SET_TX_DESC_USB_TXAGG_NUM_8188F(__pTxDesc, __Value) SET_BITS_TO_LE_4BYTE(__pTxDesc+28, 24, 8, __Value)
-#if (DEV_BUS_TYPE == RT_SDIO_INTERFACE)
+#ifdef CONFIG_SDIO_HCI
 #define SET_TX_DESC_SDIO_TXSEQ_8188F(__pTxDesc, __Value)			SET_BITS_TO_LE_4BYTE(__pTxDesc+28, 16, 8, __Value)
 #endif
 
@@ -285,15 +287,16 @@
 
 void rtl8188f_update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem);
 void rtl8188f_fill_fake_txdesc(PADAPTER padapter, u8 *pDesc, u32 BufferLen, u8 IsPsPoll, u8 IsBTQosNull, u8 bDataFrame);
-#if defined(CONFIG_CONCURRENT_MODE)
 void fill_txdesc_force_bmc_camid(struct pkt_attrib *pattrib, u8 *ptxdesc);
-#endif
 
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 s32 rtl8188fs_init_xmit_priv(PADAPTER padapter);
 void rtl8188fs_free_xmit_priv(PADAPTER padapter);
 s32 rtl8188fs_hal_xmit(PADAPTER padapter, struct xmit_frame *pxmitframe);
 s32 rtl8188fs_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe);
+#ifdef CONFIG_RTW_MGMT_QUEUE
+s32 rtl8188fs_hal_mgmt_xmitframe_enqueue(PADAPTER, struct xmit_frame *);
+#endif
 s32	rtl8188fs_hal_xmitframe_enqueue(_adapter *padapter, struct xmit_frame *pxmitframe);
 s32 rtl8188fs_xmit_buf_handler(PADAPTER padapter);
 thread_return rtl8188fs_xmit_thread(thread_context context);
@@ -310,6 +313,9 @@ s32 rtl8188fu_init_xmit_priv(PADAPTER padapter);
 void rtl8188fu_free_xmit_priv(PADAPTER padapter);
 s32 rtl8188fu_hal_xmit(PADAPTER padapter, struct xmit_frame *pxmitframe);
 s32 rtl8188fu_mgnt_xmit(PADAPTER padapter, struct xmit_frame *pmgntframe);
+#ifdef CONFIG_RTW_MGMT_QUEUE
+s32 rtl8188fu_hal_mgmt_xmitframe_enqueue(_adapter *padapter, struct xmit_frame *pxmitframe);
+#endif
 s32	 rtl8188fu_hal_xmitframe_enqueue(_adapter *padapter, struct xmit_frame *pxmitframe);
 /* s32 rtl8812au_xmit_buf_handler(PADAPTER padapter); */
 void rtl8188fu_xmit_tasklet(void *priv);
